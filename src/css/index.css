@@ -1,0 +1,70 @@
+/* ./src/index.css */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  @font-face {
+    font-family: liwaicon;
+    font-weight: 400;
+    src: url(../fonts/liwaicon.ttf) format("ttf");
+  }
+  @font-face {
+    font-family: liwaicon2;
+    src: url(../fonts/liwaicon2.ttf) format("ttf");
+  }
+}
+
+@layer components {
+  #app {
+    font-family: Avenir,Helvetica,Arial,sans-serif;
+    -webkit-font-smoothing: antialiased;
+    height: calc(100vh - 55px);
+    @apply w-full mt-10 text-center text-gray-500;
+  }
+
+  .barPanel {
+    @apply w-full h-24 relative bg-yellow-200 text-black py-3 text-lg rounded-none sm:h-12;
+  }
+
+  .liwa-edit-00 {
+    @apply flex mb-2;
+  }
+
+  .liwa-edit-00 .liwa-label {
+    @apply text-sm text-white border border-2 rounded-l px-4 py-2 whitespace-nowrap w-1/6;
+  }
+
+  .liwa-edit-00 .liwa-label.even {
+    @apply bg-green-700;
+  }
+
+  .liwa-edit-00 .liwa-label.odd {
+    @apply bg-green-500;
+  }
+
+  .top-icon {
+    @apply w-8 h-8 bg-orange-500 float-left justify-between rounded mr-2 cursor-pointer;
+  }
+
+  .top-icon.add:before {
+    content: "\e001";
+    font-family: liwaicon;
+    font-size:1.3rem;
+    color:#fee;
+  }
+
+  .top-icon.config:before {
+    content: "\e10b";
+    font-family: liwaicon;
+    font-size:1.3rem;
+    color:#fee;
+  }  
+}
+
+@layer utilities {
+  .underline-double {
+    text-decoration: underline double;
+  }
+}
+

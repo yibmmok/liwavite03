@@ -1,0 +1,21 @@
+{
+  "name": "liwavite03",
+  "version": "0.0.0",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "serve": "vite preview",
+    "css": "npx tailwindcss -i tailwind.css -o ./src/css/index.css"
+  },
+  "dependencies": {
+    "path": "^0.12.7",
+    "vue": "^3.2.25"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^2.0.0",
+    "autoprefixer": "^10.4.2",
+    "postcss": "^8.4.5",
+    "tailwindcss": "^3.0.16",
+    "vite": "^2.7.2"
+  }
+}
