@@ -4,15 +4,7 @@
 @tailwind utilities;
 
 @layer base {
-  @font-face {
-    font-family: liwaicon;
-    font-weight: 400;
-    src: url(../fonts/liwaicon.ttf) format("ttf");
-  }
-  @font-face {
-    font-family: liwaicon2;
-    src: url(../fonts/liwaicon2.ttf) format("ttf");
-  }
+  
 }
 
 @layer components {
@@ -47,19 +39,9 @@
     @apply w-8 h-8 bg-orange-500 float-left justify-between rounded mr-2 cursor-pointer;
   }
 
-  .top-icon.add:before {
-    content: "\e001";
-    font-family: liwaicon;
-    font-size:1.3rem;
-    color:#fee;
+  .tab-active {
+    @apply -mb-px border-b-4 border-blue-600;
   }
-
-  .top-icon.config:before {
-    content: "\e10b";
-    font-family: liwaicon;
-    font-size:1.3rem;
-    color:#fee;
-  }  
 }
 
 @layer utilities {

@@ -5,7 +5,7 @@
     "dev": "vite",
     "build": "vite build",
     "serve": "vite preview",
-    "css": "npx tailwindcss -i tailwind.css -o ./src/css/index.css"
+    "css": "npx tailwindcss -i ./src/css/index.css -o ./src/css/style.css"
   },
   "dependencies": {
     "path": "^0.12.7",

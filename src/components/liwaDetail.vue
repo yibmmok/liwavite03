@@ -4,8 +4,20 @@
       <div class="flex flex-col mt-4 w-11/12 sm:w-5/6 lg:w-1/2 max-w-2xl mx-auto rounded-lg border border-gray-300 shadow-xl">
         <div class="relative flex flex-row justify-between p-6 bg-white border-b border-gray-200 rounded-tl-lg rounded-tr-lg text-center ">
           <div class="absolute w-40 h-10 p-1 top-[15px]">
-            <div class="top-icon add"></div>
-            <div class="top-icon config"></div>
+            <div class="top-icon add"
+              @click=""
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7" fill="#fee" viewBox="-1 -1 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke="#fee" stroke-linejoin="round" stroke-width="6" d="M12 4v16m8-8H4" />
+              </svg>              
+            </div>
+            <div class="top-icon config"
+                 @click="showConfigPanel"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7" viewBox="-1 -1 20 20" fill="#fee">
+                <path fill-rule="evenodd" d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.533 1.533 0 012.287-.947c1.372.836 2.942-.734 2.106-2.106a1.533 1.533 0 01.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106a1.532 1.532 0 01-2.287-.947zM7 13a4 4 0 100-6 4 4 0 000 6z" clip-rule="evenodd" />
+              </svg>             
+            </div>
             <div class="top-icon btnTest" @click="descShowTest1"></div>
           </div>
           <div class="w-8 h-full bg-white"></div>
@@ -17,7 +29,7 @@
               stroke="red"
               viewBox="0 0 24 24"
               xmlns="http://www.w3.org/2000/svg"
-              @click.prevent="sendToMaster()"
+              @click.prevent="closeDetail()"
             >
               <path
                 stroke-linecap="round"
@@ -45,7 +57,7 @@
         <form class="flex flex-col px-6 py-5 bg-gray-50" >
           <div class="relative flex flex-col h-full max-w-lg mx-auto bg-gray-800 rounded-lg mb-4 cursor-pointer">
             <img 
-              :src="dataMain.image" 
+              :src="state.rowM.image" 
               class="rounded m-4"
               width="200" 
               height="200"
@@ -59,7 +71,7 @@
                 name="name"
                 placeholder="輸入員工姓名"
                 class="border border-2 rounded-r px-4 py-2 w-5/6"
-                v-model="dataMain.name"
+                v-model="state.rowM.name"
                 @change="showSaveBtn"
               />
           </div>          
@@ -71,20 +83,20 @@
                 name="title"
                 placeholder="輸入員工職稱"
                 class="border border-2 rounded-r px-4 py-2 w-5/6"
-                v-model="dataMain.title"
+                v-model="state.rowM.title"
                 @change="showSaveBtn"
               />
           </div> 
           <div class="liwa-edit-00">
               <span class="liwa-label even">所屬部門</span>
-              <input           
+              <liwaSelectBox
                 id="department"
-                type="text"
-                name="department"
-                placeholder="輸入員工所屬部門"
-                class="border border-2 rounded-r px-4 py-2 w-5/6"
-                v-model="dataMain.department"
-                @change="showSaveBtn"
+                class="h-full"
+                :splaceholder="deptDefault"
+                :smainid="state.rowM.deptID"
+                :svalue="state.rowM.department"
+                :itemsdata="items"
+                @itemChange="itemChange"
               />
           </div> 
           <div class="liwa-edit-00">
@@ -95,7 +107,7 @@
                 name="role"
                 placeholder="輸入員工角色"
                 class="border border-2 rounded-r px-4 py-2 w-5/6"
-                v-model="dataMain.role"
+                v-model="state.rowM.role"
                 @change="showSaveBtn"
               />
           </div> 
@@ -107,7 +119,7 @@
                 name="email"
                 placeholder="輸入員工Email"
                 class="border border-2 rounded-r px-4 py-2 w-5/6"
-                v-model="dataMain.email"
+                v-model="state.rowM.email"
                 @change="showSaveBtn"          
               />
           </div>     
@@ -118,19 +130,24 @@
 </template>
 
 <script setup>
-import { ref, reactive, toRefs, inject } from "vue"
+import { ref, reactive, toRefs, onMounted } from "vue"
+import liwaSelectBox from "./liwaSelectBox.vue"
 
 const dataMain = ref([])
 const isSave = ref(false)
+const deptDefault = ref('請設定所屬部門')
+const itemID = ref('test01')
+const itemSelected = ref('')
+const items = ref([]) // liwaSelectBox的資料來源
 
 const props = defineProps({
   detailTitle: {
     type: String,
     default:''
   },
-  mainID: {
-    type: String,
-    default: ''
+  liwaRowM: {
+    type: Array,
+    default: []
   },
   action: {
     type: String,
@@ -141,40 +158,52 @@ const props = defineProps({
 
 const state = reactive({
   detailTitle: props.detailTitle,
-  mainID: props.mainID,
+  rowM: props.liwaRowM,
   action: props.action
 })
 
-const emits = defineEmits(["toggleModal"])
-
-const descShowTest = inject('showTest')
-
-const descShowTest1 = () => {
-    console.log('Run in grand child element~')
-    descShowTest()
-}
+const emits = defineEmits(["hideDetail", "showMsg", "showConfig"])
 
 const showSaveBtn = () => {
     // 若為 view mode 改為 edit mode & isSave = true
-    if (state.mainID !== '') {
+    if (state.action == 'view') {
         if (isSave.value == false) isSave.value = true
         state.action = 'edit'
     }
 }
 
+const itemChange = () => {
+  showSaveBtn()
+}
+
+const loaditems = async () => {
+  try {
+     let data = await fetch("http://localhost:8102/tmp_haveD1.php?mainID=")
+      if (!data.ok) {
+        throw Error('無法載入資料')
+      }
+     let res = await data.json()
+     items.value = res.items    
+  }
+  catch (err) {
+      error.value = err.message
+      console.log(error.value)
+  }
+}
+
 const saveDetail = async () => {
     let keydata = {
-        mainID: state.mainID,
-        name: dataMain.value.name,
-        title: dataMain.value.title,
-        department: dataMain.value.department,
-        role: dataMain.value.role,
-        email: dataMain.value.email,
-        image: dataMain.value.image,
+        mainID: state.rowM.mainID,
+        name: state.rowM.name,
+        title: state.rowM.title,
+        department: state.rowM.department,
+        role: state.rowM.role,
+        email: state.rowM.email,
+        image: state.rowM.image,
         action: state.action
     }
-    let datastr = JSON.stringify(keydata)
-    console.log('datastr = ', datastr)
+    // let datastr = JSON.stringify(keydata)
+    // console.log('datastr = ', datastr)
 
     let url = 'http://localhost:8102/tmp_test01CUD.php'
     const request = new Request (
@@ -188,7 +217,7 @@ const saveDetail = async () => {
             body: JSON.stringify(keydata)
         }
     )
-    console.log('request = ', request)
+    // console.log('request = ', request)
 
     const res = await fetch(request)
     const data = await res.json()
@@ -196,35 +225,50 @@ const saveDetail = async () => {
     if (msg == '') {
         isSave.value = false
     } else {
-        alert('存檔錯誤; 訊息:'+msg)
+        // alert('存檔錯誤; 訊息:'+msg)
+        emits("showMsg")
     }
 }
 
-const sendToMaster = () => {
+const closeDetail = () => {
     emits("hideDetail")
 }
 
 const haveDetail = async (sID) => {
-    try {
-     let data = await fetch("http://localhost:8102/tmp_havePeople.php?mainID="+sID)
-      if (!data.ok) {
-        throw Error('無法載入資料')
-      }
-     let testData = await data.json()
-     dataMain.value = testData.people[0]
-    }
-    catch (err) {
-        error.value = err.message
-        console.log(error.value)
-    }
+  //   try {
+  //    let data = await fetch("http://localhost:8102/tmp_havePeople.php?mainID="+sID)
+  //     if (!data.ok) {
+  //       throw Error('無法載入資料')
+  //     }
+  //    let testData = await data.json()
+  //    state.rowM = testData.people[0]
+
+  // const objDept = document.getElementById('department')
+  // objDept.setAttribute('data-value', state.rowM.department)
+  // const objDeptInput = objDept.children[0]
+  // itemSelected.value = state.rowM.department
+  // // console.log('itemSelected =', itemSelected.value)
+  // // objDeptInput.setAttribute('value', state.rowM.department)     
+  //   }
+  //   catch (err) {
+  //       error.value = err.message
+  //       console.log(error.value)
+  //   }
 }
 
-if (props.mainID !== '') {
-    haveDetail(state.mainID)
-    isSave.value = false
-} else {
-    isSave.value = true
+const showConfigPanel = () => {
+  emits("showConfig")
 }
+
+onMounted(async () => {
+  loaditems()
+
+  if (state.action !== 'add') {
+      isSave.value = false
+  } else {
+      isSave.value = true
+  }  
+})
 
 </script>
 

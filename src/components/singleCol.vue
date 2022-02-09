@@ -44,10 +44,10 @@ const props = defineProps({
   liwaData: []
 })
 
-const emits = defineEmits(["showDetail"])
+const emits = defineEmits(["setMainID"])
 
 const sendToParent = (idx) => { 
-  emits("showDetail", idx)
+  emits("setMainID", idx)
 }
 
 </script>

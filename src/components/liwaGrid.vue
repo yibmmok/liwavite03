@@ -6,7 +6,11 @@
         <div class="py-2 align-middle inline-block min-w-full sm:px-6 lg:px-8">
           <div class="barPanel relative">
             {{ tblTitle }}
-            <div class="top-icon add absolute left-[3px] top-[9px]" @click="showDetail('')"></div>
+            <div class="top-icon add absolute left-[3px] top-[9px]" @click="showDetail('')">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7" fill="#fee" viewBox="-1 -1 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke="#fee" stroke-linejoin="round" stroke-width="6" d="M12 4v16m8-8H4" />
+              </svg>
+            </div>
           </div>
           <div class="shadow overflow-hidden border-b border-gray-200 sm:rounded-lg">
             <table class="min-w-full divide-x divide-y divide-gray-200">
@@ -31,7 +35,7 @@
               </thead>
               <singleCol 
                 :liwaData="liwaData" 
-                @showDetail="showDetail"
+                @setMainID="setMainID"
               />
             </table>
           </div>
@@ -40,29 +44,21 @@
     </div>    
   </div>
    <div v-else>載入中...</div>
-
-<!--   <liwaModal 
-    v-if="isModal"
-    :mainID="mainID"
-    :detailTitle="detailTitle"
-    :action="action"
-    @hideDetail="hideDetail"
-  /> -->
 </template>
 
 <script setup>
 import { ref, reactive, toRefs } from "vue"
 import singleCol from "./singleCol.vue"
-// import liwaModal from "./liwaModal.vue"
 
 const tblTitle = '人員列表'
-const isModal = ref(false)
 const detailTitle = ref('')
 const mainID = ref('')
 const action = ref('')
 
 const liwaData = ref([])
 const error = ref(null)
+
+const emits = defineEmits(["showDetail"])
 
 const load = async () => {
   try {
@@ -79,25 +75,8 @@ const load = async () => {
   }
 }
 
-const toggleModal = () => {  
-  isModal.value = !isModal.value
-}
-
-const hideDetail = () => {
-  isModal.value = false
-}
-
-const showDetail = (idx) => {
-  mainID.value = idx
-  if (idx !== "") {
-    detailTitle.value = '修改員工聯絡資料'
-    action.value = 'view'
-    isModal.value = true
-  } else {
-    detailTitle.value = '新增員工聯絡資料'
-    action.value = 'add'
-    isModal.value = true
-  }
+const setMainID = (idx) => {
+  emits("showDetail", idx)
 }
 
 load()
