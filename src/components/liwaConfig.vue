@@ -59,7 +59,6 @@
 	const tab4_clss = ref('')
 
 	const switchContent = (iNum) => {
-		console.log('iNum = ', iNum)
 		switch (iNum) {
 			case 1: 
 				box1_clss.value = ""

@@ -47,7 +47,7 @@
 </template>
 
 <script setup>
-import { ref, reactive, toRefs } from "vue"
+import { ref, reactive, toRefs, onMounted } from "vue"
 import singleCol from "./singleCol.vue"
 
 const tblTitle = '人員列表'
@@ -79,6 +79,16 @@ const setMainID = (idx) => {
   emits("showDetail", idx)
 }
 
-load()
+const reload = () => {
+  load()
+}
+
+onMounted(() => {
+  load()
+})
+
+defineExpose({
+  reload,
+})
 
 </script>

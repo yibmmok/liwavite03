@@ -5,7 +5,7 @@
         <div class="relative flex flex-row justify-between p-6 bg-white border-b border-gray-200 rounded-tl-lg rounded-tr-lg text-center ">
           <div class="absolute w-40 h-10 p-1 top-[15px]">
             <div class="top-icon add"
-              @click=""
+              @click="clearInput"
             >
               <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7" fill="#fee" viewBox="-1 -1 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke="#fee" stroke-linejoin="round" stroke-width="6" d="M12 4v16m8-8H4" />
@@ -21,7 +21,7 @@
             <div class="top-icon btnTest" @click="descShowTest1"></div>
           </div>
           <div class="w-8 h-full bg-white"></div>
-          <p class="font-semibold text-gray-800">{{ detailTitle }}</p>
+          <p class="font-semibold text-gray-800">{{ state.detailTitle }}</p>
           <div class="w-8 h-full bg-white cursor-pointer">
             <svg
               class="w-6 h-6 float-left"
@@ -90,6 +90,7 @@
           <div class="liwa-edit-00">
               <span class="liwa-label even">所屬部門</span>
               <liwaSelectBox
+                ref="compDept"
                 id="department"
                 class="h-full"
                 :splaceholder="deptDefault"
@@ -136,9 +137,8 @@ import liwaSelectBox from "./liwaSelectBox.vue"
 const dataMain = ref([])
 const isSave = ref(false)
 const deptDefault = ref('請設定所屬部門')
-const itemID = ref('test01')
-const itemSelected = ref('')
 const items = ref([]) // liwaSelectBox的資料來源
+const compDept = ref(null)
 
 const props = defineProps({
   detailTitle: {
@@ -162,7 +162,7 @@ const state = reactive({
   action: props.action
 })
 
-const emits = defineEmits(["hideDetail", "showMsg", "showConfig"])
+const emits = defineEmits(["hideDetail", "showMsg", "showConfig", "reloadGrid"])
 
 const showSaveBtn = () => {
     // 若為 view mode 改為 edit mode & isSave = true
@@ -196,6 +196,7 @@ const saveDetail = async () => {
         mainID: state.rowM.mainID,
         name: state.rowM.name,
         title: state.rowM.title,
+        deptID: state.rowM.deptID,
         department: state.rowM.department,
         role: state.rowM.role,
         email: state.rowM.email,
@@ -217,46 +218,40 @@ const saveDetail = async () => {
             body: JSON.stringify(keydata)
         }
     )
-    // console.log('request = ', request)
 
     const res = await fetch(request)
     const data = await res.json()
+    state.action = 'view'
+    // 重新 run liwaGrid 的load()
+    emits("reloadGrid")
     let msg = data.message
     if (msg == '') {
         isSave.value = false
     } else {
-        // alert('存檔錯誤; 訊息:'+msg)
         emits("showMsg")
     }
+}
+
+const clearInput = () => {
+  state.detailTitle = '新增員工聯絡資料'
+  state.rowM.name = ''
+  state.rowM.title = ''
+  state.rowM.deptID = ''
+  state.rowM.department = ''
+  state.rowM.role = ''
+  state.rowM.email = ''
+  state.rowM.image = ''
+  compDept.value.resetValue(state.rowM.deptID)
+  isSave.value = true
+
 }
 
 const closeDetail = () => {
     emits("hideDetail")
 }
 
-const haveDetail = async (sID) => {
-  //   try {
-  //    let data = await fetch("http://localhost:8102/tmp_havePeople.php?mainID="+sID)
-  //     if (!data.ok) {
-  //       throw Error('無法載入資料')
-  //     }
-  //    let testData = await data.json()
-  //    state.rowM = testData.people[0]
-
-  // const objDept = document.getElementById('department')
-  // objDept.setAttribute('data-value', state.rowM.department)
-  // const objDeptInput = objDept.children[0]
-  // itemSelected.value = state.rowM.department
-  // // console.log('itemSelected =', itemSelected.value)
-  // // objDeptInput.setAttribute('value', state.rowM.department)     
-  //   }
-  //   catch (err) {
-  //       error.value = err.message
-  //       console.log(error.value)
-  //   }
-}
-
 const showConfigPanel = () => {
+  console.log('Show liwaConfig')
   emits("showConfig")
 }
 
@@ -269,6 +264,7 @@ onMounted(async () => {
       isSave.value = true
   }  
 })
+
 
 </script>
 
